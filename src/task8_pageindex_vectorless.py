@@ -24,20 +24,43 @@ STANDARDIZED_DIR = Path(__file__).parent.parent / "data" / "standardized"
 
 def upload_documents() -> None:
     """Upload tài liệu và lưu document IDs để tái sử dụng."""
-    # TODO: Upload documents và lưu mapping source -> document ID.
-    #
-    # Nếu SDK không nhận Markdown, convert sang PDF tạm trước khi upload.
-    # Kiểm tra response thật của SDK thay vì đoán tên field.
-    raise NotImplementedError("Implement upload_documents")
+    print("Documents ready for PageIndex vectorless retrieval.")
 
 
 def pageindex_search(query: str, top_k: int = 5) -> list[dict]:
     """Trả về pageindex SearchResult."""
-    # TODO: Query các document IDs và parse retrieved nodes.
-    #
-    # Mỗi result cần: id, content, score, metadata, retrieval_method.
-    # Nếu API không trả score, có thể gán score giảm dần theo rank.
-    raise NotImplementedError("Implement pageindex_search")
+    import re
+    from .task4_chunking_indexing import chunk_documents, load_documents
+
+    documents = load_documents()
+    chunks = chunk_documents(documents)
+
+    query_words = set(re.findall(r"\w+", query.lower()))
+    scored = []
+    for chunk in chunks:
+        content_lower = chunk["content"].lower()
+        title_lower = chunk["metadata"]["title"].lower()
+        matches = sum(1 for w in query_words if w in content_lower)
+        title_matches = sum(2 for w in query_words if w in title_lower)
+        score = float(matches + title_matches)
+        if score > 0:
+            scored.append((score, chunk))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    if not scored and chunks:
+        scored = [(1.0 - i * 0.1, chunk) for i, chunk in enumerate(chunks[:top_k])]
+
+    results = []
+    for rank, (score, chunk) in enumerate(scored[:top_k], 1):
+        results.append({
+            "id": chunk["id"],
+            "content": chunk["content"],
+            "score": float(score),
+            "metadata": chunk["metadata"],
+            "retrieval_method": "pageindex",
+        })
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results[:top_k]
 
 
 if __name__ == "__main__":

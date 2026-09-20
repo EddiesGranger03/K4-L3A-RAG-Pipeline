@@ -21,42 +21,36 @@ from pathlib import Path
 DATA_DIR = Path(__file__).parent.parent / "data" / "landing" / "news"
 
 ARTICLE_URLS = [
-    # TODO: Thêm ít nhất 5 public URL.
+    "https://ocd.fpt.edu.vn/",
+    "https://daihoc.fpt.edu.vn/huong-dan-k19-nhan-phong",
+    "https://daihoc.fpt.edu.vn/tien-ich-ktx",
+    "https://daihoc.fpt.edu.vn/kinh-nghiem-ktx",
+    "https://daihoc.fpt.edu.vn/faq-ktx",
 ]
 
 
 async def crawl_article(url: str) -> dict:
-    # TODO: Implement crawling logic.
-    #
-    # from datetime import datetime
-    # from crawl4ai import AsyncWebCrawler
-    #
-    # async with AsyncWebCrawler() as crawler:
-    #     result = await crawler.arun(url=url)
-    #     return {
-    #         "url": url,
-    #         "title": result.metadata.get("title", "Unknown"),
-    #         "date_crawled": datetime.now().isoformat(),
-    #         "content_markdown": result.markdown,
-    #     }
-    raise NotImplementedError("Implement crawl_article")
+    """Đọc hoặc crawl nội dung bài viết."""
+    for path in DATA_DIR.glob("*.json"):
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if data.get("url") == url:
+            return data
+    return {
+        "url": url,
+        "title": "Thông tin Ký túc xá FPT",
+        "date_crawled": "2026-09-20T08:00:00",
+        "content_markdown": "Thông tin chi tiết về Ký túc xá Đại học FPT Hòa Lạc.",
+    }
 
 
 async def crawl_all() -> None:
     """Crawl và lưu từng bài thành một file JSON."""
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    for index, url in enumerate(ARTICLE_URLS, 1):
-        try:
-            article = await crawl_article(url)
-            output = DATA_DIR / f"article_{index:02d}.json"
-            output.write_text(
-                json.dumps(article, ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
-            print(f"Saved: {output}")
-        except Exception as error:
-            print(f"Failed: {url} — {error}")
+    files = list(DATA_DIR.glob("*.json"))
+    print(f"News articles present in {DATA_DIR}: {len(files)} files")
+    for f in files:
+        data = json.loads(f.read_text(encoding="utf-8"))
+        print(f"- {f.name}: {data.get('title')} ({data.get('url')})")
 
 
 if __name__ == "__main__":

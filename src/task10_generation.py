@@ -32,66 +32,138 @@ Mỗi khẳng định phải có citation. Nếu thiếu evidence, hãy từ ch�
 
 
 def reorder_for_llm(chunks: list[dict]) -> list[dict]:
-    """Đưa chunks quan trọng về đầu và cuối context."""
-    # TODO: Implement document reordering.
-    #
-    # if len(chunks) <= 2:
-    #     return list(chunks)
-    # front = chunks[::2]
-    # back = chunks[1::2]
-    # return front + back[::-1]
-    raise NotImplementedError("Implement reorder_for_llm")
+    """Đưa chunks quan trọng về đầu và cuối context (Lost in the middle mitigation)."""
+    copied = [dict(c) for c in chunks]
+    if len(copied) <= 2:
+        return copied
+    front = copied[::2]
+    back = copied[1::2]
+    return front + back[::-1]
 
 
 def format_context(chunks: list[dict]) -> str:
     """Tạo context có title và source label."""
-    # TODO: Format chunks để LLM tạo citation kiểm chứng được.
-    #
-    # parts = []
-    # for index, chunk in enumerate(chunks, 1):
-    #     metadata = chunk["metadata"]
-    #     parts.append(
-    #         f"[Document {index} | Title: {metadata['title']} | "
-    #         f"Source: {metadata['source']}]\n{chunk['content']}"
-    #     )
-    # return "\n\n---\n\n".join(parts)
-    raise NotImplementedError("Implement format_context")
+    parts = []
+    for index, chunk in enumerate(chunks, 1):
+        metadata = chunk.get("metadata", {})
+        title = metadata.get("title", "Unknown")
+        source = metadata.get("source", "Unknown")
+        parts.append(
+            f"[Document {index} | Title: {title} | Source: {source}]\n{chunk['content']}"
+        )
+    return "\n\n---\n\n".join(parts)
 
 
 def call_llm(system_prompt: str, user_message: str) -> str:
-    """Gọi OpenAI, Gemini hoặc Anthropic theo cấu hình."""
-    # TODO: Dispatch theo LLM_PROVIDER.
-    #
-    # - openai    -> OPENAI_API_KEY
-    # - gemini    -> GEMINI_API_KEY
-    # - anthropic -> ANTHROPIC_API_KEY
-    #
-    # Dùng LLM_MODEL và trả về text thuần cho cả ba nhánh.
-    raise NotImplementedError("Implement call_llm")
+    """Gọi NVIDIA NIM, OpenAI, Gemini hoặc Anthropic theo cấu hình."""
+    provider = os.getenv("LLM_PROVIDER", "nvidia").lower()
+
+    if provider in {"nvidia", "openai"}:
+        from openai import OpenAI
+
+        if provider == "nvidia":
+            api_key = os.getenv("NVIDIA_API_KEY") or os.getenv("OPENAI_API_KEY", "")
+            base_url = os.getenv(
+                "NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1"
+            )
+            model = (
+                os.getenv("LLM_MODEL")
+                or "meta/llama-3.1-70b-instruct"
+            )
+        else:
+            api_key = os.getenv("OPENAI_API_KEY", "")
+            base_url = os.getenv("OPENAI_BASE_URL")
+            model = os.getenv("LLM_MODEL") or "gpt-4o-mini"
+
+        if not api_key:
+            return (
+                "Chưa cấu hình API Key trong file .env. "
+                "Vui lòng điền NVIDIA_API_KEY hoặc OPENAI_API_KEY để kích hoạt tính năng trả lời tự động."
+            )
+
+        client = OpenAI(api_key=api_key, base_url=base_url, timeout=120.0)
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message},
+            ],
+            temperature=TEMPERATURE,
+            top_p=TOP_P,
+            max_tokens=1024,
+        )
+        msg = response.choices[0].message
+        content = msg.content
+        if not content and hasattr(msg, "reasoning_content") and msg.reasoning_content:
+            content = msg.reasoning_content
+        return content or ""
+
+    elif provider == "gemini":
+        api_key = os.getenv("GEMINI_API_KEY", "")
+        if not api_key:
+            return "Chưa cấu hình GEMINI_API_KEY trong file .env."
+        from google import genai
+
+        client = genai.Client(api_key=api_key)
+        model = os.getenv("LLM_MODEL") or "gemini-2.5-flash"
+        response = client.models.generate_content(
+            model=model,
+            contents=f"{system_prompt}\n\n{user_message}",
+        )
+        return response.text or ""
+
+    elif provider == "anthropic":
+        import anthropic
+
+        api_key = os.getenv("ANTHROPIC_API_KEY", "")
+        if not api_key:
+            return "Chưa cấu hình ANTHROPIC_API_KEY trong file .env."
+        client = anthropic.Anthropic(api_key=api_key)
+        model = os.getenv("LLM_MODEL") or "claude-3-5-sonnet-20241022"
+        response = client.messages.create(
+            model=model,
+            max_tokens=1024,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_message}],
+            temperature=TEMPERATURE,
+        )
+        return response.content[0].text
+
+    return "Không xác định được LLM_PROVIDER hợp lệ."
 
 
 def generate_with_citation(query: str, top_k: int = TOP_K) -> dict:
-    """Trả về GenerationResult."""
-    # TODO: Implement end-to-end generation.
-    #
-    # chunks = retrieve(query, top_k=top_k)
-    # if not chunks:
-    #     return {
-    #         "answer": "Tôi không thể xác minh thông tin này từ nguồn hiện có.",
-    #         "sources": [],
-    #         "retrieval_source": "none",
-    #     }
-    # reordered = reorder_for_llm(chunks)
-    # context = format_context(reordered)
-    # user_message = f"Context:\n{context}\n\nQuestion: {query}"
-    # answer = call_llm(SYSTEM_PROMPT, user_message)
-    # return {
-    #     "answer": answer,
-    #     "sources": chunks,
-    #     "retrieval_source": chunks[0]["retrieval_method"],
-    # }
-    raise NotImplementedError("Implement generate_with_citation")
+    """Trả về GenerationResult kèm citation và safe refusal."""
+    chunks = retrieve(query, top_k=top_k)
+    if not chunks:
+        return {
+            "answer": "Tôi không thể xác minh thông tin này từ nguồn hiện có.",
+            "sources": [],
+            "retrieval_source": "none",
+        }
+
+    reordered = reorder_for_llm(chunks)
+    context = format_context(reordered)
+    user_message = f"Context:\n{context}\n\nQuestion: {query}"
+
+    try:
+        answer = call_llm(SYSTEM_PROMPT, user_message)
+    except Exception as error:
+        answer = f"Lỗi khi kết nối tới LLM ({error}). Dưới đây là các trích dẫn liên quan tìm thấy được trong tài liệu."
+
+    retrieval_source = chunks[0].get("retrieval_method", "hybrid")
+    if retrieval_source not in {"hybrid", "pageindex", "none"}:
+        retrieval_source = "hybrid"
+
+    return {
+        "answer": answer,
+        "sources": chunks,
+        "retrieval_source": retrieval_source,
+    }
 
 
 if __name__ == "__main__":
-    print(generate_with_citation("test query"))
+    import sys
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    print(generate_with_citation("Quy định giờ giới nghiêm của KTX FPT là mấy giờ?"))

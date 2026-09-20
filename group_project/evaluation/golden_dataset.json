@@ -1,0 +1,82 @@
+[
+  {
+    "question": "Giờ giới nghiêm của Ký túc xá FPT Hòa Lạc là mấy giờ?",
+    "expected_answer": "Giờ giới nghiêm trong ký túc xá FPT Hòa Lạc là sau 22 giờ 30 phút tối (10h30 tối). Sinh viên không được đưa người lạ không ở trong KTX vào phòng sau giờ này.",
+    "expected_context": "Giờ giới nghiêm trong ký túc xá là sau 10 giờ 30 phút tối. Không được đưa người lạ không ở trong ký túc xá vào phòng sau giờ giới nghiêm."
+  },
+  {
+    "question": "Sinh viên ở KTX FPT được cấp định mức điện và nước miễn phí mỗi kỳ là bao nhiêu?",
+    "expected_answer": "Mỗi phòng KTX FPT được cấp định mức miễn phí mỗi kỳ là 200 số điện và 12 số nước.",
+    "expected_context": "Định mức miễn phí: 200 số điện & 12 số nước. Dùng vượt định mức: Nộp phí phụ trội."
+  },
+  {
+    "question": "Đơn giá điện và nước phụ trội khi dùng vượt định mức tại KTX FPT là bao nhiêu?",
+    "expected_answer": "Đơn giá phụ trội khi dùng vượt định mức là 2.500 đồng/số điện và 10.000 đồng/số nước.",
+    "expected_context": "Đơn giá: 2,500đ/số điện, 10,000đ/số nước khi dùng vượt định mức."
+  },
+  {
+    "question": "Kích thước giường tiêu chuẩn tại các tòa Dom CDFH và Dom AB là bao nhiêu?",
+    "expected_answer": "Kích thước giường tiêu chuẩn là 2000 x 900 mm đối với các Dom C, D, F, H và 1930 x 900 mm đối với Dom A, B.",
+    "expected_context": "Kích thước giường: 2000X900mm (Dom CDFH), 1930x900mm (Dom AB)."
+  },
+  {
+    "question": "Điểm uy tín CFD score trong KTX FPT là gì và dùng để làm gì?",
+    "expected_answer": "Điểm uy tín (Credibility in FPT Dormitory – CFD score) là tiêu chí đánh giá ý thức của sinh viên khi sử dụng dịch vụ ký túc xá, tăng giảm theo hành vi và nội quy, và là tiêu chí xét duyệt sinh viên có được tiếp tục ở KTX trong kỳ tiếp theo hay không.",
+    "expected_context": "Điểm uy tín (Credibility in FPT Dormitory – CFD score) là tiêu chí để đánh giá ý thức của sinh viên khi sử dụng dịch vụ ký túc xá và là một trong những tiêu chí được dùng để xét duyệt xem sinh viên có được sử dụng ký túc xá trong kỳ hay không."
+  },
+  {
+    "question": "Các hành vi nào bị nghiêm cấm trong KTX FPT?",
+    "expected_answer": "Các hành vi nghiêm cấm gồm: nuôi vật nuôi/thú cưng, uống rượu bia, cờ bạc, chất kích thích và chất cấm, nấu ăn trong KTX, đưa người lạ vào phòng sau giờ giới nghiêm, không giữ vệ sinh chung.",
+    "expected_context": "Không được nuôi vật nuôi, thú cưng; Không được uống rượu, bia, chơi cờ bạc, sử dụng các chất kích thích và chất cấm; Không được nấu ăn trong ký túc xá; Không được đưa người lạ không ở trong ký túc xá vào phòng sau giờ giới nghiêm."
+  },
+  {
+    "question": "Làm thế nào để gửi yêu cầu hỗ trợ (My Request) tới Ban Quản lý KTX FPT?",
+    "expected_answer": "Sinh viên vào chức năng My request trên cổng ocd.fpt.edu.vn, bấm Create new request, chọn Type request thích hợp, điền nội dung vào phần Content và bấm Create request.",
+    "expected_context": "1. Vào chức năng My request. 2. Bấm vào nút Create new request -> chọn loại yêu cầu (Type request) thích hợp. 3. Điền nội dung của yêu cầu ở phần Content. 4. Bấm vào nút Create request."
+  },
+  {
+    "question": "Khi đồ dùng hoặc thiết bị kỹ thuật trong phòng KTX bị hỏng thì báo ở đâu và như thế nào?",
+    "expected_answer": "Sinh viên vào My request trên cổng OCD, chọn Báo cáo vấn đề kỹ thuật để chuyển tới trang cim.fpt.edu.vn, điền thông tin và gửi ảnh tình trạng thiết bị rồi bấm Create.",
+    "expected_context": "Vào chức năng My request -> chọn Báo cáo vấn đề kỹ thuật ở mục Type request. Hệ thống sẽ dẫn tới trang https://cim.fpt.edu.vn/. Điền những thông tin cần thiết và gửi ảnh tình trạng thiết bị rồi bấm Create."
+  },
+  {
+    "question": "Số điện thoại đường dây nóng của phòng bảo vệ và phòng y tế KTX FPT là gì?",
+    "expected_answer": "Hotline hỗ trợ 24/7 của phòng bảo vệ là (024) 668 05913 và phòng y tế là (024) 668 05917.",
+    "expected_context": "Thông tin liên lạc của phòng bảo vệ và phòng y tế (24/7): Phòng bảo vệ: (024) 668 05913, Phòng y tế: (024) 668 05917."
+  },
+  {
+    "question": "Năm học tại Đại học FPT gồm những học kỳ nào và kéo dài trong các tháng nào?",
+    "expected_answer": "Năm học tại FPTU gồm 3 kỳ: Kỳ Spring từ tháng 1 đến tháng 4, kỳ Summer từ tháng 5 đến tháng 8, và kỳ Fall từ tháng 9 đến tháng 12.",
+    "expected_context": "Thời hạn lưu trú các kỳ: Kỳ Spring: Tháng 1 - tháng 4; Kỳ Summer: Tháng 5 - tháng 8; Kỳ Fall: Tháng 9 - tháng 12."
+  },
+  {
+    "question": "Dịch vụ Internet tại KTX FPT do đơn vị nào cung cấp và đăng ký ở đâu?",
+    "expected_answer": "KTX hỗ trợ hạ tầng cho các nhà mạng FPT Telecom và Viettel cung cấp dịch vụ. Sinh viên đăng ký tại phòng trực Dom C hoặc liên hệ hotline đặt tại sảnh các Dom.",
+    "expected_context": "Internet: KTX không trực tiếp cung cấp cáp. Hỗ trợ hạ tầng cho các nhà mạng FPT Telecom, Viettel cung cấp dịch vụ cho SV. Điểm tiếp nhận đăng ký mạng: Phòng trực Dom C hoặc liên hệ hotline đặt tại sảnh các Dom."
+  },
+  {
+    "question": "Cán bộ Ban Quản lý KTX kiểm tra phòng định kỳ vào những khung giờ nào?",
+    "expected_answer": "Kiểm tra định kỳ được thực hiện từ 09h00 đến 11h30 và từ 14h00 đến 17h00 các ngày trong tuần.",
+    "expected_context": "Kiểm tra định kỳ: Được thực hiện từ 09h00 đến 11h30 và từ 14h00 đến 17h00 các ngày trong tuần."
+  },
+  {
+    "question": "Mức phạt trừ điểm CFD đối với hành vi nấu ăn trong phòng KTX là bao nhiêu?",
+    "expected_answer": "Hành vi nấu ăn trong phòng KTX hoặc dùng bếp từ, bếp gas, nồi cơm điện không phép sẽ bị trừ từ 20 đến 30 điểm CFD và tịch thu thiết bị vi phạm.",
+    "expected_context": "Nấu ăn trong phòng KTX, sử dụng bếp từ, bếp gas, nồi cơm điện không được cấp phép: Trừ 20 - 30 điểm CFD, tịch thu thiết bị vi phạm."
+  },
+  {
+    "question": "Sinh viên có được nuôi chó, mèo hoặc thú cưng trong KTX không và mức phạt là gì?",
+    "expected_answer": "Sinh viên tuyệt đối không được nuôi thú cưng, vật nuôi trong KTX. Nếu vi phạm sẽ bị trừ 20 điểm CFD và yêu cầu đưa vật nuôi ra khỏi KTX trong vòng 24 giờ.",
+    "expected_context": "Nuôi thú cưng, vật nuôi (chó, mèo, chim, bò sát...): Trừ 20 điểm CFD, yêu cầu đưa vật nuôi ra khỏi KTX trong vòng 24h."
+  },
+  {
+    "question": "Khi tân sinh viên nhận phòng KTX FPT cần xuất trình những giấy tờ gì và làm thủ tục ở đâu?",
+    "expected_answer": "Sinh viên xuất trình CCCD hoặc thẻ sinh viên/giấy báo nhập học tại bàn trực sảnh tầng 1 của các tòa Dom hoặc hội trường BQL KTX, sau đó kiểm tra và ký biên bản bàn giao thiết bị.",
+    "expected_context": "Địa điểm: Sảnh tầng 1 của các tòa KTX (Dom A, B, C, D, E, F, G, H). Xuất trình Căn cước công dân (CCCD) hoặc thẻ sinh viên/giấy báo nhập học để cán bộ đối chiếu và ký biên bản bàn giao cơ sở vật chất."
+  },
+  {
+    "question": "Thời hạn sinh viên có quyền khiếu nại điểm uy tín CFD sau khi nhận thông báo vi phạm là bao lâu?",
+    "expected_answer": "Sinh viên có quyền gửi đơn khiếu nại qua chức năng My Request trên cổng ocd.fpt.edu.vn trong vòng 03 ngày làm việc kể từ khi nhận thông báo vi phạm.",
+    "expected_context": "Quyền khiếu nại: Sinh viên có quyền gửi đơn khiếu nại qua chức năng My Request trên cổng ocd.fpt.edu.vn trong vòng 03 ngày làm việc kể từ khi nhận thông báo vi phạm."
+  }
+]
