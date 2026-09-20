@@ -22,63 +22,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Load media (video or image) as base64 for reliable rendering
-def get_base64_media(file_path: str) -> str:
-    if not file_path:
-        return ""
-    path = Path(file_path)
-    if path.exists():
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode("utf-8")
-    return ""
-
-# Check if a background video exists, otherwise fallback to image
-video_file = None
-for candidate in ["background.mp4", "ghibli_background.mp4", "ghibli_wallpaper.mp4"]:
-    if Path(candidate).exists():
-        video_file = candidate
-        break
-
-video_b64 = get_base64_media(video_file) if video_file else ""
-wallpaper_b64 = get_base64_media("ghibli_wallpaper.jpg")
-
-# Video background HTML tag (if video is present)
-video_html = (
-    f"""
+# Video background HTML tag
+video_html = """
     <video autoplay loop muted playsinline id="bg-video">
-        <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+        <source src="https://strvid.nyc3.cdn.digitaloceanspaces.com/motionsite/nature-sunset.mp4" type="video/mp4">
     </video>
-    """
-    if video_b64
-    else ""
-)
-
-# Background styling for .stApp depending on media type
-bg_style = (
-    """
-    .stApp {
-        background: color-mix(in srgb, var(--background-color) 70%, transparent) !important;
-    }
-    #bg-video {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        z-index: -999;
-        pointer-events: none;
-    }
-    """
-    if video_b64
-    else f"""
-    .stApp {{
-        background: radial-gradient(ellipse at 50% 25%, color-mix(in srgb, var(--background-color) 72%, transparent) 0%, color-mix(in srgb, var(--background-color) 92%, transparent) 100%),
-                    url("data:image/jpeg;base64,{wallpaper_b64}") no-repeat center bottom fixed !important;
-        background-size: cover !important;
-    }}
-    """
-)
+"""
 
 # Inject external fonts safely
 st.markdown('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">', unsafe_allow_html=True)
@@ -90,59 +39,102 @@ st.markdown(
     {video_html}
     <style>
 
-    {bg_style}
+    #bg-video {{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: -999;
+        pointer-events: none;
+        filter: brightness(0.6) sepia(0.2) hue-rotate(-20deg); /* VERDE nature vibe overlay */
+    }}
+
+    /* Brutal transparency for Streamlit core elements */
+    :root {{
+        --background-color: transparent !important;
+        --secondary-background-color: transparent !important;
+    }}
+
+    .stApp, .stAppViewContainer, .stAppViewBlockContainer, .main, [data-testid="stHeader"] {{
+        background: transparent !important;
+        background-color: transparent !important;
+    }}
+
+    /* Brutal transparency for all bottom container wrappers EXCEPT the actual chat input box */
+    [data-testid="stBottom"], 
+    [data-testid="stBottom"] div:not([data-testid="stChatInput"]):not([data-testid="stChatInput"] *) {{
+        background: transparent !important;
+        background-color: transparent !important;
+    }}
 
     /* Apply Be Vietnam Pro everywhere to prevent any Vietnamese font distortion and fix color contrast */
-    html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, button, textarea, [data-testid="stChatMessage"] {{
+    html, body, [class*="css"], .stApp, .stMarkdown, p, input, button, textarea, [data-testid="stChatMessage"] {{
         font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         letter-spacing: -0.01em;
-        color: var(--text-color) !important;
+        color: #ffffff !important;
     }}
 
-    /* Make header and bottom input container transparent */
-    [data-testid="stHeader"] {{
-        background: transparent !important;
+    /* Restore Icon Fonts */
+    .fa, .fas, .fa-solid, .fa-regular, .fa-light, .fa-brands, i[class*="fa-"] {{
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+        font-weight: 900 !important;
     }}
-    [data-testid="stBottom"] {{
-        background: transparent !important;
+    .material-symbols-rounded, .stIcon, span[class*="icon"] {{
+        font-family: "Material Symbols Rounded", "Material Icons", sans-serif !important;
     }}
 
     /* Sidebar Glassmorphism */
-    [data-testid="stSidebar"] {{
-        background: color-mix(in srgb, var(--secondary-background-color) 88%, transparent) !important;
+    [data-testid="stSidebar"],
+    [data-testid="stSidebar"] > div:first-child {{
+        background: rgba(27, 48, 34, 0.35) !important;
+        background-color: rgba(27, 48, 34, 0.35) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        border-right: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 4px 0 25px rgba(0, 0, 0, 0.1) !important;
+    }}
+
+    /* Alerts and Info boxes Glassmorphism */
+    [data-testid="stAlert"] {{
+        background: rgba(255, 255, 255, 0.15) !important;
+        backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        border-radius: 12px !important;
+        color: #ffffff !important;
+    }}
+    [data-testid="stAlert"] * {{
+        color: #ffffff !important;
     }}
 
     /* Chat Messages Glassmorphism */
     [data-testid="stChatMessage"] {{
-        background: color-mix(in srgb, var(--background-color) 75%, transparent) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
-        border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 18px !important;
         padding: 1.2rem 1.4rem !important;
         margin-bottom: 1rem !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
-        color: var(--text-color) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
         font-size: 1.02rem !important;
         line-height: 1.65 !important;
+        color: #ffffff !important;
     }}
 
     [data-testid="stChatMessage"]:hover {{
-        border-color: var(--primary-color) !important;
+        border-color: #4a7c59 !important;
         box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
     }}
 
     /* Chat Input Glassmorphism */
     [data-testid="stChatInput"] {{
-        background: color-mix(in srgb, var(--background-color) 88%, transparent) !important;
+        background: rgba(255, 255, 255, 0.15) !important;
         backdrop-filter: blur(16px) !important;
-        border: 1px solid var(--primary-color) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 18px !important;
-        color: var(--text-color) !important;
+        color: #ffffff !important;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
     }}
 
@@ -153,21 +145,21 @@ st.markdown(
 
     /* Expander Glassmorphism */
     [data-testid="stExpander"] {{
-        background: color-mix(in srgb, var(--background-color) 65%, transparent) !important;
+        background: rgba(27, 48, 34, 0.6) !important;
         backdrop-filter: blur(14px) !important;
-        border: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         border-radius: 14px !important;
         margin-top: 0.6rem !important;
-        color: var(--text-color) !important;
+        color: #ffffff !important;
     }}
 
     /* Buttons */
     .stButton > button {{
-        background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
         backdrop-filter: blur(10px) !important;
-        border: 1px solid color-mix(in srgb, var(--text-color) 15%, transparent) !important;
+        border: 1px solid rgba(255, 255, 255, 0.3) !important;
         border-radius: 12px !important;
-        color: var(--text-color) !important;
+        color: #ffffff !important;
         font-weight: 500 !important;
         text-align: left !important;
         transition: all 0.2s ease !important;
@@ -176,10 +168,10 @@ st.markdown(
     }}
 
     .stButton > button:hover {{
-        background: color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
-        border-color: var(--primary-color) !important;
+        background: rgba(74, 124, 89, 0.4) !important;
+        border-color: #4a7c59 !important;
         transform: translateY(-1px) !important;
-        color: var(--primary-color) !important;
+        color: #ffffff !important;
     }}
 
     /* Title & Subtitle styling */
@@ -187,7 +179,7 @@ st.markdown(
         font-family: 'Be Vietnam Pro', sans-serif;
         font-weight: 700;
         font-size: 2.1rem;
-        background: linear-gradient(135deg, var(--text-color) 30%, var(--primary-color) 100%);
+        background: linear-gradient(135deg, #ffffff 30%, #4a7c59 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.2rem;
@@ -195,16 +187,16 @@ st.markdown(
 
     .app-sub {{
         font-size: 0.95rem;
-        color: color-mix(in srgb, var(--text-color) 75%, transparent);
+        color: rgba(255, 255, 255, 0.85);
         margin-bottom: 1.5rem;
         line-height: 1.5;
     }}
 
     .rag-badge {{
         display: inline-block;
-        background: color-mix(in srgb, var(--primary-color) 15%, transparent);
-        color: var(--primary-color);
-        border: 1px solid color-mix(in srgb, var(--primary-color) 35%, transparent);
+        background: rgba(74, 124, 89, 0.2);
+        color: #4a7c59;
+        border: 1px solid rgba(74, 124, 89, 0.4);
         border-radius: 8px;
         padding: 0.25rem 0.6rem;
         font-size: 0.82rem;
