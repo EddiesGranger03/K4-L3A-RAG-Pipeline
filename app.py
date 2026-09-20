@@ -86,15 +86,17 @@ bg_style = (
 st.markdown(
     f"""
     {video_html}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 
     {bg_style}
 
-    /* Apply Be Vietnam Pro everywhere to prevent any Vietnamese font distortion */
+    /* Apply Be Vietnam Pro everywhere to prevent any Vietnamese font distortion and fix color contrast */
     html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, button, textarea, [data-testid="stChatMessage"] {{
         font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         letter-spacing: -0.01em;
+        color: #f1f5f9 !important;
     }}
 
     /* Make header and bottom input container transparent */
@@ -218,21 +220,21 @@ if "messages" not in st.session_state:
 
 # Sidebar configuration
 with st.sidebar:
-    st.markdown('<div class="rag-badge">⚡ RAG Pipeline Active</div>', unsafe_allow_html=True)
-    st.title("🏢 KTX FPT Assistant")
+    st.markdown('<div class="rag-badge"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i> RAG Pipeline Active</div>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0;"><i class="fa-solid fa-building" style="color: #38bdf8;"></i> KTX FPT Assistant</h1>', unsafe_allow_html=True)
     st.markdown("**Hệ thống tư vấn Ký túc xá FPT University (Hòa Lạc)**")
     st.markdown("---")
 
     llm_provider = os.getenv("LLM_PROVIDER", "nvidia").upper()
     llm_model = os.getenv("LLM_MODEL", "z-ai/glm-5.3-flash")
-    st.info(f"🤖 **LLM Engine:** {llm_provider}\n\n📦 **Model:** `{llm_model}`\n\n🎯 **Chế độ:** Full Chunks Hybrid RAG")
+    st.info(f"**LLM Engine:** {llm_provider}\n\n**Model:** `{llm_model}`\n\n**Chế độ:** Full Chunks Hybrid RAG", icon=":material/memory:")
 
-    if st.button("🗑️ Xóa lịch sử trò chuyện", use_container_width=True):
+    if st.button("Xóa lịch sử trò chuyện", icon=":material/delete:", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
 
     st.markdown("---")
-    st.subheader("💡 Câu hỏi thường gặp:")
+    st.markdown('<h3><i class="fa-solid fa-lightbulb" style="color: #fbbf24;"></i> Câu hỏi thường gặp:</h3>', unsafe_allow_html=True)
     sample_queries = [
         "Giờ giới nghiêm của KTX FPT là mấy giờ?",
         "Định mức điện nước miễn phí mỗi kỳ là bao nhiêu?",
@@ -245,7 +247,7 @@ with st.sidebar:
             st.session_state.suggested_query = q
 
 # Main app header
-st.markdown('<div class="app-title">🏢 Trợ lý Ảo Ký túc xá FPT University Hà Nội</div>', unsafe_allow_html=True)
+st.markdown('<div class="app-title"><i class="fa-solid fa-building-user"></i> Trợ lý Ảo Ký túc xá FPT University Hà Nội</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="app-sub">Tra cứu chính xác nội quy, thủ tục nhận phòng, chi phí điện nước, điểm uy tín CFD và quy trình hỗ trợ sinh viên tại Campus Hòa Lạc.</div>',
     unsafe_allow_html=True,
@@ -256,7 +258,7 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         if message.get("sources"):
-            with st.expander(f"📚 Nguồn tham khảo ({len(message['sources'])} chunks) — Phương thức: {message.get('retrieval_source', 'hybrid')}"):
+            with st.expander(f"Nguồn tham khảo ({len(message['sources'])} chunks) — Phương thức: {message.get('retrieval_source', 'hybrid')}", icon=":material/menu_book:"):
                 for idx, src in enumerate(message["sources"], 1):
                     meta = src.get("metadata", {})
                     st.markdown(
@@ -289,7 +291,7 @@ if query:
             st.markdown(answer)
 
             if sources:
-                with st.expander(f"📚 Nguồn tham khảo ({len(sources)} chunks) — Phương thức: {retrieval_source}"):
+                with st.expander(f"Nguồn tham khảo ({len(sources)} chunks) — Phương thức: {retrieval_source}", icon=":material/menu_book:"):
                     for idx, src in enumerate(sources, 1):
                         meta = src.get("metadata", {})
                         st.markdown(
