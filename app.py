@@ -17,35 +17,84 @@ except Exception:
     pass
 
 st.set_page_config(
-
-    page_title="FPT Dormitory RAG Assistant — Ghibli Live",
-    page_icon="✨",
+    page_title="FPT Dormitory Assistant — KTX Hòa Lạc",
+    page_icon="🏢",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
-# Load wallpaper as base64 for reliable rendering
-def get_base64_image(image_path: str) -> str:
-    path = Path(image_path)
+# Load media (video or image) as base64 for reliable rendering
+def get_base64_media(file_path: str) -> str:
+    if not file_path:
+        return ""
+    path = Path(file_path)
     if path.exists():
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode("utf-8")
     return ""
 
-wallpaper_b64 = get_base64_image("ghibli_wallpaper.jpg")
+# Check if a background video exists, otherwise fallback to image
+video_file = None
+for candidate in ["background.mp4", "ghibli_background.mp4", "ghibli_wallpaper.mp4"]:
+    if Path(candidate).exists():
+        video_file = candidate
+        break
 
-# Inject dynamic Ghibli Live Wallpaper, drifting clouds, canvas particles, and glassmorphism
-st.markdown(
+video_b64 = get_base64_media(video_file) if video_file else ""
+wallpaper_b64 = get_base64_media("ghibli_wallpaper.jpg")
+
+# Video background HTML tag (if video is present)
+video_html = (
     f"""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap');
+    <video autoplay loop muted playsinline id="bg-video">
+        <source src="data:video/mp4;base64,{video_b64}" type="video/mp4">
+    </video>
+    """
+    if video_b64
+    else ""
+)
 
-    /* Background image & gradient overlay */
+# Background styling for .stApp depending on media type
+bg_style = (
+    """
+    .stApp {
+        background: transparent !important;
+    }
+    #bg-video {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: -999;
+        pointer-events: none;
+        filter: brightness(0.45) contrast(1.05);
+    }
+    """
+    if video_b64
+    else f"""
     .stApp {{
-        background: radial-gradient(circle at 50% 30%, rgba(20, 35, 70, 0.4) 0%, rgba(5, 10, 25, 0.85) 100%),
+        background: radial-gradient(ellipse at 50% 25%, rgba(15, 23, 42, 0.72) 0%, rgba(8, 14, 28, 0.92) 100%),
                     url("data:image/jpeg;base64,{wallpaper_b64}") no-repeat center bottom fixed !important;
         background-size: cover !important;
-        font-family: 'Plus Jakarta Sans', sans-serif !important;
-        color: #f8fafc !important;
+    }}
+    """
+)
+
+# Inject Modern Clean Glassmorphism CSS with 100% Vietnamese Font (Be Vietnam Pro)
+st.markdown(
+    f"""
+    {video_html}
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+
+    {bg_style}
+
+    /* Apply Be Vietnam Pro everywhere to prevent any Vietnamese font distortion */
+    html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, button, textarea, [data-testid="stChatMessage"] {{
+        font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        letter-spacing: -0.01em;
     }}
 
     /* Make header and bottom input container transparent */
@@ -58,50 +107,51 @@ st.markdown(
 
     /* Sidebar Glassmorphism */
     [data-testid="stSidebar"] {{
-        background: rgba(8, 14, 32, 0.72) !important;
-        backdrop-filter: blur(22px) !important;
-        -webkit-backdrop-filter: blur(22px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+        background: rgba(10, 16, 32, 0.88) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
         box-shadow: 4px 0 25px rgba(0, 0, 0, 0.4) !important;
     }}
 
     /* Chat Messages Glassmorphism */
     [data-testid="stChatMessage"] {{
-        background: rgba(14, 22, 46, 0.58) !important;
-        backdrop-filter: blur(18px) !important;
-        -webkit-backdrop-filter: blur(18px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.14) !important;
-        border-radius: 20px !important;
-        padding: 1.25rem 1.5rem !important;
+        background: rgba(15, 23, 42, 0.75) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 18px !important;
+        padding: 1.2rem 1.4rem !important;
         margin-bottom: 1rem !important;
-        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35) !important;
-        transition: transform 0.2s ease, border-color 0.2s ease !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+        color: #f1f5f9 !important;
+        font-size: 1.02rem !important;
+        line-height: 1.65 !important;
     }}
 
     [data-testid="stChatMessage"]:hover {{
-        border-color: rgba(137, 180, 250, 0.45) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), 0 0 15px rgba(137, 180, 250, 0.2) !important;
+        border-color: rgba(96, 165, 250, 0.45) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45) !important;
     }}
 
     /* Chat Input Glassmorphism */
     [data-testid="stChatInput"] {{
-        background: rgba(12, 18, 40, 0.75) !important;
+        background: rgba(15, 23, 42, 0.88) !important;
         backdrop-filter: blur(16px) !important;
-        border: 1px solid rgba(137, 180, 250, 0.35) !important;
+        border: 1px solid rgba(96, 165, 250, 0.45) !important;
         border-radius: 18px !important;
         color: #ffffff !important;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
     }}
 
     [data-testid="stChatInput"]:focus-within {{
-        border-color: #89b4fa !important;
-        box-shadow: 0 8px 35px rgba(0, 0, 0, 0.6), 0 0 18px rgba(137, 180, 250, 0.4) !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 8px 35px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.35) !important;
     }}
 
     /* Expander Glassmorphism */
     [data-testid="stExpander"] {{
-        background: rgba(10, 16, 35, 0.5) !important;
+        background: rgba(15, 23, 42, 0.65) !important;
         backdrop-filter: blur(14px) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         border-radius: 14px !important;
@@ -111,174 +161,54 @@ st.markdown(
     /* Buttons */
     .stButton > button {{
         background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(12px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.16) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 12px !important;
         color: #f8fafc !important;
         font-weight: 500 !important;
-        transition: all 0.25s ease !important;
+        text-align: left !important;
+        transition: all 0.2s ease !important;
+        padding: 0.6rem 0.9rem !important;
+        font-size: 0.92rem !important;
     }}
 
     .stButton > button:hover {{
-        background: rgba(137, 180, 250, 0.25) !important;
-        border-color: #89b4fa !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+        background: rgba(56, 189, 248, 0.2) !important;
+        border-color: #38bdf8 !important;
+        transform: translateY(-1px) !important;
+        color: #ffffff !important;
     }}
 
-    /* Title & Badge styling */
-    .ghibli-title {{
-        font-family: 'Outfit', sans-serif;
+    /* Title & Subtitle styling */
+    .app-title {{
+        font-family: 'Be Vietnam Pro', sans-serif;
         font-weight: 700;
-        font-size: 2.2rem;
-        background: linear-gradient(135deg, #ffffff 40%, #89b4fa 100%);
+        font-size: 2.1rem;
+        background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.2rem;
     }}
 
-    .ghibli-sub {{
+    .app-sub {{
         font-size: 0.95rem;
         color: #cbd5e1;
         margin-bottom: 1.5rem;
+        line-height: 1.5;
     }}
 
-    /* Drifting Clouds Animation Layer */
-    .cloud-drift {{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 200%;
-        height: 50%;
-        background-image: radial-gradient(ellipse 60% 40% at 50% 20%, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
-        animation: drift 100s linear infinite;
-        pointer-events: none;
-        z-index: 0;
-    }}
-
-    @keyframes drift {{
-        0% {{ transform: translateX(0); }}
-        100% {{ transform: translateX(-50%); }}
+    .rag-badge {{
+        display: inline-block;
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        border-radius: 8px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
     }}
     </style>
-
-    <!-- Drifting clouds background element -->
-    <div class="cloud-drift"></div>
-
-    <!-- Live Interactive Canvas: Stars, Dandelions, Fireflies -->
-    <canvas id="liveGhibliCanvas" style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
-
-    <script>
-    (function() {{
-        const canvas = document.getElementById('liveGhibliCanvas');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        let w = canvas.width = window.innerWidth;
-        let h = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {{
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-        }});
-
-        // Stars
-        const stars = [];
-        for (let i = 0; i < 90; i++) {{
-            stars.push({{
-                x: Math.random() * w,
-                y: Math.random() * (h * 0.6),
-                r: Math.random() * 1.5 + 0.4,
-                a: Math.random(),
-                speed: Math.random() * 0.03 + 0.01
-            }});
-        }}
-
-        // Dandelion seeds
-        const dandelions = [];
-        for (let i = 0; i < 45; i++) {{
-            dandelions.push({{
-                x: Math.random() * w,
-                y: Math.random() * h,
-                vx: Math.random() * 0.9 + 0.3,
-                vy: Math.random() * 0.3 - 0.15,
-                r: Math.random() * 3 + 2,
-                a: Math.random() * 0.45 + 0.35,
-                wobble: Math.random() * Math.PI * 2
-            }});
-        }}
-
-        // Fireflies
-        const fireflies = [];
-        for (let i = 0; i < 25; i++) {{
-            fireflies.push({{
-                x: Math.random() * w,
-                y: h * 0.4 + Math.random() * (h * 0.55),
-                vx: (Math.random() - 0.5) * 0.6,
-                vy: (Math.random() - 0.5) * 0.5,
-                r: Math.random() * 2 + 1.5,
-                pulse: Math.random() * Math.PI * 2
-            }});
-        }}
-
-        function loop() {{
-            ctx.clearRect(0, 0, w, h);
-
-            // Draw Stars
-            for (let s of stars) {{
-                s.a += s.speed;
-                const alpha = (Math.sin(s.a) + 1) / 2 * 0.8;
-                ctx.fillStyle = `rgba(240, 245, 255, ${{alpha}})`;
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                ctx.fill();
-            }}
-
-            // Draw Dandelions
-            for (let d of dandelions) {{
-                d.wobble += 0.03;
-                d.x += d.vx + Math.sin(d.wobble) * 0.8;
-                d.y += d.vy + Math.cos(d.wobble) * 0.2;
-                if (d.x > w + 20) d.x = -20;
-                if (d.y > h + 20) d.y = -20;
-                if (d.y < -20) d.y = h + 20;
-
-                ctx.fillStyle = `rgba(255, 255, 255, ${{d.a}})`;
-                ctx.beginPath();
-                ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = `rgba(200, 230, 255, ${{d.a * 0.3}})`;
-                ctx.beginPath();
-                ctx.arc(d.x, d.y, d.r * 2.2, 0, Math.PI * 2);
-                ctx.fill();
-            }}
-
-            // Draw Fireflies
-            for (let f of fireflies) {{
-                f.pulse += 0.04;
-                f.x += f.vx;
-                f.y += f.vy;
-                if (f.x < 0 || f.x > w) f.vx *= -1;
-                if (f.y < h * 0.35 || f.y > h * 0.95) f.vy *= -1;
-
-                const glow = (Math.sin(f.pulse) + 1) / 2;
-                const radius = f.r * (2.5 + glow * 2);
-                const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, radius);
-                grad.addColorStop(0, 'rgba(168, 255, 120, 0.9)');
-                grad.addColorStop(0.5, 'rgba(120, 240, 180, 0.3)');
-                grad.addColorStop(1, 'rgba(120, 240, 180, 0)');
-
-                ctx.fillStyle = grad;
-                ctx.beginPath();
-                ctx.arc(f.x, f.y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }}
-
-            requestAnimationFrame(loop);
-        }}
-        requestAnimationFrame(loop);
-    }})();
-    </script>
     """,
     unsafe_allow_html=True,
 )
@@ -286,33 +216,38 @@ st.markdown(
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Sidebar configuration
 with st.sidebar:
+    st.markdown('<div class="rag-badge">⚡ RAG Pipeline Active</div>', unsafe_allow_html=True)
     st.title("🏢 KTX FPT Assistant")
-    st.markdown("**Chủ đề:** Dịch vụ đại học — Ký túc xá FPT University (Hòa Lạc)")
+    st.markdown("**Hệ thống tư vấn Ký túc xá FPT University (Hòa Lạc)**")
     st.markdown("---")
 
     llm_provider = os.getenv("LLM_PROVIDER", "nvidia").upper()
     llm_model = os.getenv("LLM_MODEL", "z-ai/glm-5.3-flash")
-    st.info(f"🤖 **LLM Engine:** {llm_provider}\n\n📦 **Model:** `{llm_model}`")
+    st.info(f"🤖 **LLM Engine:** {llm_provider}\n\n📦 **Model:** `{llm_model}`\n\n🎯 **Chế độ:** Full Chunks Hybrid RAG")
 
-    top_k = st.slider("Số lượng Chunks truy xuất (top_k)", min_value=3, max_value=10, value=5)
+    if st.button("🗑️ Xóa lịch sử trò chuyện", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
 
     st.markdown("---")
-    st.subheader("💡 Câu hỏi gợi ý:")
+    st.subheader("💡 Câu hỏi thường gặp:")
     sample_queries = [
         "Giờ giới nghiêm của KTX FPT là mấy giờ?",
         "Định mức điện nước miễn phí mỗi kỳ là bao nhiêu?",
         "Khi thiết bị trong phòng hỏng thì báo ở đâu?",
-        "Quy định trừ điểm uy tín CFD khi nấu ăn trong phòng?",
-        "Trường ĐH Bách Khoa có bao nhiêu cơ sở? (Test từ chối)",
+        "Quy định trừ điểm uy tín CFD khi vi phạm?",
+        "Trường ĐH Bách Khoa có mấy cơ sở? (Test từ chối)",
     ]
     for q in sample_queries:
-        if st.button(q, key=f"btn_{q}"):
+        if st.button(q, key=f"btn_{q}", use_container_width=True):
             st.session_state.suggested_query = q
 
-st.markdown('<div class="ghibli-title">🏢 Trợ lý Ảo Ký túc xá FPT University Hà Nội</div>', unsafe_allow_html=True)
+# Main app header
+st.markdown('<div class="app-title">🏢 Trợ lý Ảo Ký túc xá FPT University Hà Nội</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="ghibli-sub">Hệ thống RAG tra cứu nội quy, biểu phí, điểm uy tín và thủ tục lưu trú KTX FPT (Hòa Lạc) — Phong cách Ghibli Live Wallpaper</div>',
+    '<div class="app-sub">Tra cứu chính xác nội quy, thủ tục nhận phòng, chi phí điện nước, điểm uy tín CFD và quy trình hỗ trợ sinh viên tại Campus Hòa Lạc.</div>',
     unsafe_allow_html=True,
 )
 
@@ -326,13 +261,13 @@ for message in st.session_state.messages:
                     meta = src.get("metadata", {})
                     st.markdown(
                         f"**[{idx}] {meta.get('title', 'Tài liệu')}** (`{meta.get('source', '')}`) | "
-                        f"Điểm số: `{src.get('score', 0):.4f}` | "
-                        f"Method: `{src.get('retrieval_method', '')}`"
+                        f"Độ tương quan: `{src.get('score', 0):.4f}` | "
+                        f"Phương thức: `{src.get('retrieval_method', '')}`"
                     )
-                    st.caption(src.get("content", "")[:300] + "...")
+                    st.caption(src.get("content", "")[:350] + "...")
 
 # Handle query from input or sample buttons
-query = st.chat_input("Nhập câu hỏi về KTX FPT...")
+query = st.chat_input("Nhập câu hỏi về KTX FPT (ví dụ: giờ giới nghiêm, phí điện nước, báo hỏng thiết bị)...")
 if getattr(st.session_state, "suggested_query", None):
     query = st.session_state.suggested_query
     st.session_state.suggested_query = None
@@ -344,8 +279,9 @@ if query:
         st.markdown(query)
 
     with st.chat_message("assistant"):
-        with st.spinner("Đang tra cứu tài liệu và tổng hợp câu trả lời..."):
-            result = generate_with_citation(query, top_k=top_k)
+        with st.spinner("Đang tra cứu dữ liệu và tổng hợp câu trả lời..."):
+            # Chạy full chunks tối ưu (top_k=5) tự động
+            result = generate_with_citation(query, top_k=5)
             answer = result["answer"]
             sources = result["sources"]
             retrieval_source = result["retrieval_source"]
@@ -358,10 +294,10 @@ if query:
                         meta = src.get("metadata", {})
                         st.markdown(
                             f"**[{idx}] {meta.get('title', 'Tài liệu')}** (`{meta.get('source', '')}`) | "
-                            f"Điểm số: `{src.get('score', 0):.4f}` | "
-                            f"Method: `{src.get('retrieval_method', '')}`"
+                            f"Độ tương quan: `{src.get('score', 0):.4f}` | "
+                            f"Phương thức: `{src.get('retrieval_method', '')}`"
                         )
-                        st.caption(src.get("content", "")[:300] + "...")
+                        st.caption(src.get("content", "")[:350] + "...")
 
     st.session_state.messages.append({
         "role": "assistant",

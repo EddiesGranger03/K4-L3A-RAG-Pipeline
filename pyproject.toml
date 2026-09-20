@@ -7,7 +7,7 @@ name = "k4-day08-rag-pipeline"
 version = "0.1.0"
 description = "Day 8 lab for building and evaluating a RAG pipeline"
 readme = "README.md"
-requires-python = ">=3.10,<3.14"
+requires-python = ">=3.10,<3.15"
 dependencies = [
     "anthropic>=0.40.0,<2",
     "chromadb>=0.5.0,<2",
@@ -21,7 +21,7 @@ dependencies = [
     "markitdown[pdf]>=0.1.0,<0.2",
     "numpy>=1.26.0,<3",
     "openai>=2.45.0,<3",
-    "pageindex==0.2.8",
+    "pageindex>=0.2.8,<1",
     "python-dotenv>=1.0.0,<2",
     "ragas==0.4.3",
     "rank-bm25>=0.2.2,<0.3",

@@ -27,8 +27,12 @@ TEMPERATURE = 0.3
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
 LLM_MODEL = os.getenv("LLM_MODEL", "")
 
-SYSTEM_PROMPT = """Trả lời chỉ từ context được cung cấp.
-Mỗi khẳng định phải có citation. Nếu thiếu evidence, hãy từ chối xác minh."""
+SYSTEM_PROMPT = """Bạn là trợ lý AI thông minh chuyên tư vấn Ký túc xá Đại học FPT (Hòa Lạc).
+Yêu cầu bắt buộc:
+1. Trả lời TRỰC TIẾP, RÕ RÀNG, ĐẦY ĐỦ bằng tiếng Việt dựa trên Context được cung cấp.
+2. Mỗi khẳng định, số liệu hoặc quy định PHẢI có trích dẫn nguồn dạng [Document X | Title].
+3. Nếu Context không chứa thông tin hoặc câu hỏi ngoài phạm vi KTX FPT, hãy từ chối an toàn: 'Tôi không thể xác minh thông tin này từ nguồn hiện có.'
+4. Trả lời súc tích, đi thẳng vào trọng tâm, không suy nghĩ lòng vòng."""
 
 
 def reorder_for_llm(chunks: list[dict]) -> list[dict]:
@@ -68,7 +72,7 @@ def call_llm(system_prompt: str, user_message: str) -> str:
             )
             model = (
                 os.getenv("LLM_MODEL")
-                or "meta/llama-3.1-70b-instruct"
+                or "z-ai/glm-5.3-flash"
             )
         else:
             api_key = os.getenv("OPENAI_API_KEY", "")
@@ -81,7 +85,7 @@ def call_llm(system_prompt: str, user_message: str) -> str:
                 "Vui lòng điền NVIDIA_API_KEY hoặc OPENAI_API_KEY để kích hoạt tính năng trả lời tự động."
             )
 
-        client = OpenAI(api_key=api_key, base_url=base_url, timeout=120.0)
+        client = OpenAI(api_key=api_key, base_url=base_url, timeout=90.0)
         response = client.chat.completions.create(
             model=model,
             messages=[
@@ -90,13 +94,21 @@ def call_llm(system_prompt: str, user_message: str) -> str:
             ],
             temperature=TEMPERATURE,
             top_p=TOP_P,
-            max_tokens=1024,
+            max_tokens=2048,
         )
         msg = response.choices[0].message
         content = msg.content
-        if not content and hasattr(msg, "reasoning_content") and msg.reasoning_content:
-            content = msg.reasoning_content
-        return content or ""
+        if not content:
+            # Trích xuất reasoning_content dự phòng nếu có
+            reasoning = getattr(msg, "reasoning_content", None)
+            if not reasoning and hasattr(msg, "model_extra") and msg.model_extra:
+                reasoning = msg.model_extra.get("reasoning_content")
+            if reasoning:
+                content = str(reasoning).strip()
+
+        if not content:
+            return "Tôi không thể xác minh thông tin này từ nguồn hiện có."
+        return content
 
     elif provider == "gemini":
         api_key = os.getenv("GEMINI_API_KEY", "")
