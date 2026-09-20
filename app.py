@@ -58,7 +58,7 @@ video_html = (
 bg_style = (
     """
     .stApp {
-        background: transparent !important;
+        background: color-mix(in srgb, var(--background-color) 70%, transparent) !important;
     }
     #bg-video {
         position: fixed;
@@ -69,13 +69,12 @@ bg_style = (
         object-fit: cover;
         z-index: -999;
         pointer-events: none;
-        filter: brightness(0.45) contrast(1.05);
     }
     """
     if video_b64
     else f"""
     .stApp {{
-        background: radial-gradient(ellipse at 50% 25%, rgba(15, 23, 42, 0.72) 0%, rgba(8, 14, 28, 0.92) 100%),
+        background: radial-gradient(ellipse at 50% 25%, color-mix(in srgb, var(--background-color) 72%, transparent) 0%, color-mix(in srgb, var(--background-color) 92%, transparent) 100%),
                     url("data:image/jpeg;base64,{wallpaper_b64}") no-repeat center bottom fixed !important;
         background-size: cover !important;
     }}
@@ -86,8 +85,8 @@ bg_style = (
 st.markdown(
     f"""
     {video_html}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
     @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 
     {bg_style}
@@ -96,7 +95,7 @@ st.markdown(
     html, body, [class*="css"], .stApp, .stMarkdown, p, div, span, input, button, textarea, [data-testid="stChatMessage"] {{
         font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         letter-spacing: -0.01em;
-        color: #f1f5f9 !important;
+        color: var(--text-color) !important;
     }}
 
     /* Make header and bottom input container transparent */
@@ -109,41 +108,41 @@ st.markdown(
 
     /* Sidebar Glassmorphism */
     [data-testid="stSidebar"] {{
-        background: rgba(10, 16, 32, 0.88) !important;
+        background: color-mix(in srgb, var(--secondary-background-color) 88%, transparent) !important;
         backdrop-filter: blur(20px) !important;
         -webkit-backdrop-filter: blur(20px) !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
-        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.4) !important;
+        border-right: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.1) !important;
     }}
 
     /* Chat Messages Glassmorphism */
     [data-testid="stChatMessage"] {{
-        background: rgba(15, 23, 42, 0.75) !important;
+        background: color-mix(in srgb, var(--background-color) 75%, transparent) !important;
         backdrop-filter: blur(16px) !important;
         -webkit-backdrop-filter: blur(16px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid color-mix(in srgb, var(--text-color) 12%, transparent) !important;
         border-radius: 18px !important;
         padding: 1.2rem 1.4rem !important;
         margin-bottom: 1rem !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
-        color: #f1f5f9 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        color: var(--text-color) !important;
         font-size: 1.02rem !important;
         line-height: 1.65 !important;
     }}
 
     [data-testid="stChatMessage"]:hover {{
-        border-color: rgba(96, 165, 250, 0.45) !important;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45) !important;
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25) !important;
     }}
 
     /* Chat Input Glassmorphism */
     [data-testid="stChatInput"] {{
-        background: rgba(15, 23, 42, 0.88) !important;
+        background: color-mix(in srgb, var(--background-color) 88%, transparent) !important;
         backdrop-filter: blur(16px) !important;
-        border: 1px solid rgba(96, 165, 250, 0.45) !important;
+        border: 1px solid var(--primary-color) !important;
         border-radius: 18px !important;
-        color: #ffffff !important;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5) !important;
+        color: var(--text-color) !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
     }}
 
     [data-testid="stChatInput"]:focus-within {{
@@ -153,20 +152,21 @@ st.markdown(
 
     /* Expander Glassmorphism */
     [data-testid="stExpander"] {{
-        background: rgba(15, 23, 42, 0.65) !important;
+        background: color-mix(in srgb, var(--background-color) 65%, transparent) !important;
         backdrop-filter: blur(14px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent) !important;
         border-radius: 14px !important;
         margin-top: 0.6rem !important;
+        color: var(--text-color) !important;
     }}
 
     /* Buttons */
     .stButton > button {{
-        background: rgba(255, 255, 255, 0.08) !important;
+        background: color-mix(in srgb, var(--text-color) 8%, transparent) !important;
         backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border: 1px solid color-mix(in srgb, var(--text-color) 15%, transparent) !important;
         border-radius: 12px !important;
-        color: #f8fafc !important;
+        color: var(--text-color) !important;
         font-weight: 500 !important;
         text-align: left !important;
         transition: all 0.2s ease !important;
@@ -175,10 +175,10 @@ st.markdown(
     }}
 
     .stButton > button:hover {{
-        background: rgba(56, 189, 248, 0.2) !important;
-        border-color: #38bdf8 !important;
+        background: color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+        border-color: var(--primary-color) !important;
         transform: translateY(-1px) !important;
-        color: #ffffff !important;
+        color: var(--primary-color) !important;
     }}
 
     /* Title & Subtitle styling */
@@ -186,7 +186,7 @@ st.markdown(
         font-family: 'Be Vietnam Pro', sans-serif;
         font-weight: 700;
         font-size: 2.1rem;
-        background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
+        background: linear-gradient(135deg, var(--text-color) 30%, var(--primary-color) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0.2rem;
@@ -194,16 +194,16 @@ st.markdown(
 
     .app-sub {{
         font-size: 0.95rem;
-        color: #cbd5e1;
+        color: color-mix(in srgb, var(--text-color) 75%, transparent);
         margin-bottom: 1.5rem;
         line-height: 1.5;
     }}
 
     .rag-badge {{
         display: inline-block;
-        background: rgba(56, 189, 248, 0.15);
-        color: #38bdf8;
-        border: 1px solid rgba(56, 189, 248, 0.35);
+        background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+        color: var(--primary-color);
+        border: 1px solid color-mix(in srgb, var(--primary-color) 35%, transparent);
         border-radius: 8px;
         padding: 0.25rem 0.6rem;
         font-size: 0.82rem;
@@ -221,7 +221,7 @@ if "messages" not in st.session_state:
 # Sidebar configuration
 with st.sidebar:
     st.markdown('<div class="rag-badge"><i class="fa-solid fa-bolt" style="color: #fbbf24;"></i> RAG Pipeline Active</div>', unsafe_allow_html=True)
-    st.markdown('<h1 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0;"><i class="fa-solid fa-building" style="color: #38bdf8;"></i> KTX FPT Assistant</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0;"><i class="fa-solid fa-building" style="color: var(--primary-color);"></i> KTX FPT Assistant</h1>', unsafe_allow_html=True)
     st.markdown("**Hệ thống tư vấn Ký túc xá FPT University (Hòa Lạc)**")
     st.markdown("---")
 
