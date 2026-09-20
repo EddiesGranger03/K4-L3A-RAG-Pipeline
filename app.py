@@ -18,7 +18,6 @@ except Exception:
 
 st.set_page_config(
     page_title="FPT Dormitory Assistant — KTX Hòa Lạc",
-    page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -81,13 +80,15 @@ bg_style = (
     """
 )
 
+# Inject external fonts safely
+st.markdown('<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">', unsafe_allow_html=True)
+st.markdown('<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">', unsafe_allow_html=True)
+
 # Inject Modern Clean Glassmorphism CSS with 100% Vietnamese Font (Be Vietnam Pro)
 st.markdown(
     f"""
     {video_html}
     <style>
-    @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-    @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
 
     {bg_style}
 
@@ -253,9 +254,16 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# SVG Avatars for Chat
+USER_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIiBmaWxsPSIjMzhiZGY4Ij48cGF0aCBkPSJNMjI0IDI1NkExMjggMTI4IDAgMSAwIDIyNCAwYTEyOCAxMjggMCAxIDAgMCAyNTZ6bS00NS43IDQ4Qzc5LjggMzA0IDAgMzgzLjggMCA0ODIuM0MwIDQ5OC43IDEzLjMgNTEyIDI5LjcgNTEySDQxOC4zYzE2LjQgMCAyOS43LTEzLjMgMjkuNy0yOS43QzQ0OCAzODMuOCAzNjguMiAzMDQgMjY5LjcgMzA0SDE3OC4zeiIvPjwvc3ZnPg=="
+BOT_AVATAR = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjZmJiZjI0Ij48cGF0aCBkPSJNMjU2IDBjLTE3LjcgMC0zMiAxNC4zLTMyIDMyVjY2LjdDMTUwLjMgNzIuNSA5NiAxMzYuNSA5NiAyMTMuM1YzODRjMCA1MyA0MyA5NiA5NiA5NkgzMjBjNTMgMCA5Ni00MyA5Ni05NlYyMTMuM2MwLTc2LjgtNTQuMy0xNDAuOC0xMjgtMTQ2LjdWMzJjMC0xNy43LTE0LjMtMzItMzItMzJ6TTIxNSAyNTZhNDEgNDEgMCAxIDEgLTgyIDAgNDEgNDEgMCAxIDEgODIgMHptMTY0IDBhNDEgNDEgMCAxIDEgLTgyIDAgNDEgNDEgMCAxIDEgODIgMHoiLz48L3N2Zz4="
+
+def get_avatar(role):
+    return USER_AVATAR if role == "user" else BOT_AVATAR
+
 # Render chat history
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    with st.chat_message(message["role"], avatar=get_avatar(message["role"])):
         st.markdown(message["content"])
         if message.get("sources"):
             with st.expander(f"Nguồn tham khảo ({len(message['sources'])} chunks) — Phương thức: {message.get('retrieval_source', 'hybrid')}", icon=":material/menu_book:"):
@@ -277,10 +285,10 @@ if getattr(st.session_state, "suggested_query", None):
 if query:
     st.session_state.messages.append({"role": "user", "content": query})
 
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.markdown(query)
 
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
         with st.spinner("Đang tra cứu dữ liệu và tổng hợp câu trả lời..."):
             # Chạy full chunks tối ưu (top_k=5) tự động
             result = generate_with_citation(query, top_k=5)
